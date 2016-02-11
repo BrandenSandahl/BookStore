@@ -65,16 +65,48 @@ public class BookStore {
     }
 
     public static void viewEntry() {
-        int i = 1;
         for (String key : bookMap.keySet() ) {
-            System.out.printf("%d. %s%n", i, key);
-            i++;
+            System.out.printf("%s%n", key);
         }
-        System.out.println("Please choose a book to view");
-        int bookChoice = Integer.parseInt(scanner.nextLine());
+        System.out.println("Please enter the name of the book to view");
+        String bookChoice = scanner.nextLine();
+        System.out.println(bookMap.get(bookChoice));
 
+        System.out.println("Do you wish to edit this entry? [y/n]");
+        if (scanner.nextLine().equalsIgnoreCase("y")) {
+            editEntry(bookChoice);
+        }
     }
 
+    public static void editEntry(String bookChoice) {
+        bookMap.get(bookChoice).setAuthor();
+        bookMap.get(bookChoice).setShortDescription();
+        bookMap.get(bookChoice).setYear();
+        bookMap.get(bookChoice).setIsbn();
+        bookMap.get(bookChoice).setRating();
+
+        System.out.println(bookMap.get(bookChoice));
+
+        //recommit the file
+        try {
+            saveAllToFile(bookMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveAllToFile(HashMap bookMap) throws IOException {
+        File f = new File("BookStoreInventory.json");
+        FileWriter fw = new FileWriter(f);
+
+        JsonSerializer serializer = new JsonSerializer();
+
+        for (Object b : bookMap.values()) {
+            String output = serializer.include("*").serialize(b);
+            fw.append(output).append("\n");
+        }
+        fw.close();
+    }
 
     public static void saveToFile(Book b) throws IOException {
         File f = new File("BookStoreInventory.json");
